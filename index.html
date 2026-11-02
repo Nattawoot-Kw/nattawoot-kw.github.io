@@ -108,6 +108,15 @@ ul,ol{list-style:none}
 .cam.off .lampfx{display:none}
 .dark-room{position:absolute; inset:0; z-index:4; background:#02030f; opacity:0; pointer-events:none; --m:radial-gradient(ellipse 10% 11% at 42.2% 24%,#0000 62%,#000); -webkit-mask:var(--m); mask:var(--m)}
 .cam.off .dark-room{opacity:.96}
+/* in the dark the NATTO sign shorts out: the tube stutters, pixel bolts arc off it and sparks rain down */
+.cam.off .neon,.cam.off .halo{animation:shortout 2.3s steps(1) infinite}
+@keyframes shortout{0%,100%{opacity:1}6%{opacity:.25}8%{opacity:1}12%{opacity:.1}14%{opacity:.9}37%{opacity:1}39%{opacity:0}42%{opacity:1}44%{opacity:.15}46%{opacity:1}69%{opacity:.4}71%{opacity:1}86%{opacity:0}89%{opacity:.85}91%{opacity:.1}94%{opacity:1}}
+.sparks{display:none; position:absolute; inset:0; z-index:5; pointer-events:none}
+.cam.off .sparks{display:block}
+.sparks i{position:absolute; width:max(3px,.5cqw); aspect-ratio:1; background:var(--c); opacity:0; animation:spark var(--d) steps(6) var(--o) infinite}
+@keyframes spark{0%,42%{opacity:0; transform:none}44%{opacity:1; transform:none}100%{opacity:0; transform:translate(var(--dx),var(--dy))}}
+.sparks b{position:absolute; left:var(--l); top:var(--t); width:var(--w); height:var(--h); background:#fff; rotate:var(--r); filter:drop-shadow(0 0 .25cqw #ff5fd0); opacity:0; clip-path:polygon(42% 0,70% 0,56% 34%,92% 34%,30% 100%,44% 54%,10% 54%); animation:arc 2.3s steps(1) var(--o) infinite}
+@keyframes arc{0%,100%{opacity:0}12%,13%{opacity:1}14%{opacity:0}39%,41%{opacity:1}42%{opacity:0}86%,88%{opacity:1}89%{opacity:0}}
 /* in the dark a note stays by the lamp until the visitor switches it back on */
 .lamp-hint{display:none; position:absolute; z-index:5; left:1.8%; bottom:55%; max-width:27%; padding:.45em .75em; background:var(--sun); color:var(--ink); border:2px solid #fff; border-radius:8px; font:400 max(12px,1.35cqw)/1.25 var(--f-ui); pointer-events:none; animation:hintglow 2.4s ease-in-out infinite}
 .lamp-hint::after{content:""; position:absolute; left:22%; top:100%; border-inline:7px solid #0000; border-top:9px solid var(--sun)}
@@ -367,7 +376,8 @@ ul,ol{list-style:none}
   .view{position:fixed; z-index:10}
 }
 @media (prefers-reduced-motion:reduce){
-  .hero .frames img,.body,.lid,.lids,.vn-next,.pin,.neon,.halo,.tw,.stage.shake,.boom b,.lampfx,.lampfx i,.lamp-hint{animation:none!important}
+  .hero .frames img,.body,.lid,.lids,.vn-next,.pin,.neon,.halo,.tw,.stage.shake,.boom b,.lampfx,.lampfx i,.lamp-hint,.sparks i,.sparks b{animation:none!important}
+  .sparks{display:none!important}
   .boom b{display:none}
   .panel,.say,.roster,.cam{transition:none}
 }
@@ -382,6 +392,7 @@ ul,ol{list-style:none}
       <div class="dots" aria-hidden="true"></div>
       <div class="dark-room" aria-hidden="true"></div>
       <div class="fx" id="fx" aria-hidden="true"></div>
+      <div class="sparks" id="sparks" aria-hidden="true"></div>
       <p class="lamp-hint" aria-hidden="true">มืดจัง... กดโคมเปิดไฟให้หน่อยนะครับ</p>
       <button class="hot" id="lamp" style="left:2.6%;top:46.5%;width:9.6%;height:11.5%" aria-label="สวิตช์โคมไฟ"></button>
       <button class="hot" id="sign" style="left:37.4%;top:20%;width:9.6%;height:7.4%" aria-label="ป้ายไฟ NATTO"></button>
@@ -736,8 +747,21 @@ const TOWERS=[[52.3,54,34.5,48],[59.1,60.8,35.2,48],[48,50,37.5,48],[50.6,51.9,4
 const lights=TOWERS.flatMap(t=>Array.from({length:7},()=>[rnd(t[0],t[1]),rnd(t[2],t[3])])).map(p=>`<i class="tw" style="left:${p[0]}%;top:${p[1]}%;width:.28%;height:.5%;background:${['#ffe98f','#7fe3d8','#ff9fb8'][Math.random()*3|0]};--d:${rnd(3,8)}s;--o:-${rnd(0,6)}s"></i>`).join('');
 fx.innerHTML=`<div class="halo"></div><div class="crop neon" style="${NEON}"></div>${stars}${lights}`;
 
+document.getElementById('sparks').innerHTML=Array.from({length:28},()=>`<i style="left:${rnd(37.5,47)}%;top:${rnd(20.5,27)}%;--c:${['#fff','#ff9fe6','#ffd23f','#ff5fd0'][Math.random()*4|0]};--d:${rnd(1.1,3.2)}s;--o:-${rnd(0,3)}s;--dx:${rnd(-2.6,2.6)}cqw;--dy:${rnd(2,6.5)}cqw"></i>`).join('')
+  +[[36.6,19.6,1.9,4.6,'-18deg',0],[46.6,20.4,1.7,4,'22deg',-.03],[41.4,26.6,1.6,4.2,'8deg',-.06]].map(a=>`<b style="--l:${a[0]}%;--t:${a[1]}%;--w:${a[2]}%;--h:${a[3]}%;--r:${a[4]};--o:${a[5]}s"></b>`).join('');
+/* short bursts of electrical crackle while the room is dark */
+let crackle=0;
+function zap(){
+  if(!cam.classList.contains('off')) return;
+  if(!muted&&audio&&audio.state==='running'&&!calm){
+    const n=audio.sampleRate*.09|0, buf=audio.createBuffer(1,n,audio.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<n;i++) d[i]=(i%7<3?1:-1)*Math.random()*(1-i/n);
+    const s=audio.createBufferSource(), g=audio.createGain(); s.buffer=buf; g.gain.value=.03; s.connect(g).connect(audio.destination); s.start();
+  }
+  crackle=setTimeout(zap,rnd(700,2400));
+}
 /* lamp switch */
-document.getElementById('lamp').onclick=()=>{ sfx('lamp'); say.textContent=cam.classList.toggle('off')?DARK:'เปิดไฟแล้วครับ'; };
+document.getElementById('lamp').onclick=()=>{ sfx('lamp'); const off=cam.classList.toggle('off'); say.textContent=off?DARK:'เปิดไฟแล้วครับ'; clearTimeout(crackle); if(off) crackle=setTimeout(zap,500); };
 
 /* Natto's eyes follow the pointer, one sprite pixel at a time */
 document.querySelector('.vn-face').insertAdjacentHTML('beforeend',EYEBALLS);
