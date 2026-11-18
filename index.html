@@ -217,7 +217,7 @@ ul,ol{list-style:none}
 .grid{display:grid; grid-template-columns:1fr 1fr; grid-auto-rows:minmax(0,1fr); gap:8px; flex:1 1 0; min-height:0}
 .work{position:relative; overflow:hidden; background:var(--ink); text-align:left; min-height:0; filter:drop-shadow(0 3px 0 #2a234066)}
 /* pixel frame per world: nine-slice, so corners keep their art at any tile shape */
-.work::after{content:""; position:absolute; inset:0; pointer-events:none; border:clamp(16px,5.2cqmin,24px) solid; border-image:var(--frame) var(--cut); image-rendering:pixelated}
+.work::after{content:""; position:absolute; inset:0; pointer-events:none; border:clamp(8px,2.6cqmin,12px) solid; border-image:var(--frame) var(--cut); image-rendering:pixelated}
 [data-world="about"]{--frame:url(assets/frames/about.webp); --cut:68}
 [data-world="ai"]{--frame:url(assets/frames/ai.webp); --cut:72}
 [data-world="ape"]{--frame:url(assets/frames/ape.webp); --cut:78}
@@ -228,11 +228,11 @@ ul,ol{list-style:none}
 .work video{opacity:0}
 .work video.on{opacity:1}
 /* the picture fills the frame opening edge to edge */
-.work img,.work video{position:absolute; inset:clamp(15px,5cqmin,23px); width:calc(100% - 2*clamp(15px,5cqmin,23px)); height:calc(100% - 2*clamp(15px,5cqmin,23px)); max-width:none; object-fit:cover}
+.work img,.work video{position:absolute; inset:clamp(7px,2.5cqmin,11px); width:calc(100% - 2*clamp(7px,2.5cqmin,11px)); height:calc(100% - 2*clamp(7px,2.5cqmin,11px)); max-width:none; object-fit:cover}
 .work span{position:absolute; z-index:1; left:50%; bottom:2px; translate:-50% 0; max-width:calc(100% - 28px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#fff; font-size:.8rem; line-height:1.3; padding:1px 3px; text-shadow:-1.5px 0 0 #000,1.5px 0 0 #000,0 -1.5px 0 #000,0 1.5px 0 #000,-1.5px -1.5px 0 #000,1.5px -1.5px 0 #000,-1.5px 1.5px 0 #000,1.5px 1.5px 0 #000}
 .grid .work:first-child:nth-last-child(odd){grid-column:1/-1}
 .work:hover{transform:rotate(-1deg)}
-.work i{position:absolute; z-index:1; right:26px; top:26px; font:400 1rem/1 var(--f-tiny); font-style:normal; background:var(--coral); color:#fff; padding:3px 6px}
+.work i{position:absolute; z-index:1; right:16px; top:16px; font:400 1rem/1 var(--f-tiny); font-style:normal; background:var(--coral); color:#fff; padding:3px 6px}
 .pager{display:flex; flex:none; justify-content:center; align-items:center; gap:14px; font:400 1.2rem/1 var(--f-tiny)}
 .pager button,.copy{background:var(--teal); color:#fff; font:400 1.3rem/1 var(--f-tiny); clip-path:polygon(0 8%,100% 0,96% 100%,4% 100%); box-shadow:inset 0 -4px 0 var(--pink)}
 .pager button{width:44px; height:34px}
@@ -418,7 +418,7 @@ const W=[
   {id:"ai",nav:"AI",art:"laptop",x:362,y:432,w:105,label:"AI STUDIO",sub:"หนังสั้นและคลิปโซเชียล",line:"ตอนนี้ผมกำกับหนังด้วย AI แต่ยังใช้สายตาแบบคนทำ 3D",
    tag:"World 06 · AI Film & Social · 2026",title:"Directed with AI",lede:"ใช้ประสบการณ์ด้านภาพและการกำกับจากงาน 3D มาทำซีรีส์ AI ของตัวเอง \"ท่านเทพโรตี\" (ไทย-อังกฤษ) เว็บไซต์องค์กร โฆษณา และคลิปโซเชียล",
    chips:["Google Flow","Seedance (Higgsfield)","ElevenLabs","Blender previz","Claude + MCP"],
-   items:[["ท่านเทพโรตี / Lord Roti · AI Series","ai-roti.jpg",null,"https://www.youtube.com/@ThanThepRoti"],["Brooker Group Website · Web","ai-brookerweb.jpg",null,"https://www.brookergroup.com/th"],["Clone Squad · Trendy","ai-clone.jpg","ai-clone.mp4"],["Brooker Kinetic · Brand","ai-kinetic.jpg"],["Brook UFO · Trendy","ai-ufo.jpg"],["Tech EP01 · Explainer","ai-tech.jpg"],["สอบขับรถ · Trendy","ai-driving.jpg"]]},
+   items:[["Brooker Group Website · Web","ai-brookerweb.jpg",null,"https://www.brookergroup.com/th"],["Clone Squad · Trendy","ai-clone.jpg","ai-clone.mp4"],["Brooker Kinetic · Brand","ai-kinetic.jpg"],["Brook UFO · Trendy","ai-ufo.jpg"],["Tech EP01 · Explainer","ai-tech.jpg"],["ท่านเทพโรตี · AI Series","ai-roti-v.jpg","ai-roti.mp4"]]},
   {id:"unity",nav:"VR",art:"vr",x:206,y:496,w:112,cls:"edge-l",label:"UNITY + VRCHAT",sub:"Shader และ VRChat",line:"ยุค Unity: เล่น shader, particle และพาตัวเองเข้า VRChat",
    tag:"World 01 · Game Engine",title:"Unity & VRChat",lede:"ทดลองทำ shader ทั้งโลก, particle ใบไม้ และการทำ avatar กับฉากสำหรับ VRChat",
    chips:["Global Shader","Leaf Particles","Gameplay","VRChat"],
@@ -595,7 +595,7 @@ addEventListener('keydown',e=>{ if(e.key==='Escape'){ view.hidden?close():closeV
 document.querySelector('.stage').addEventListener('click',e=>{ if(!e.target.closest('.thing,.hot,.ask')) close(); });
 
 /* every picture fills its frame; SPOT keeps the subject in view */
-const SPOT={'punk-city.jpg':'50% 45%','about-outfit.jpg':'50% 28%','about-body.jpg':'50% 28%','about-id.jpg':'50% 30%','about-face.jpg':'50% 32%','about-wire.jpg':'50% 35%','unity-globe.jpg':'50% 45%','unity-forest.jpg':'50% 50%','ai-tech.jpg':'50% 40%','peng-logo.jpg':'50% 50%','peng-ski.jpg':'50% 35%','peng-crown.jpg':'50% 38%','peng-scroll.jpg':'50% 24%','natto-anime.webp':'50% 42%','natto-3d.webp':'50% 46%','peng-crew.jpg':'50% 10%','peng-contract.jpg':'50% 52%','peng-guardian.jpg':'50% 33%','fn-proxie2.jpg':'50% 22%','fn-bullbear.jpg':'72% 50%','fn-broom.jpg':'72% 50%','unity-vrchat.jpg':'50% 18%','unity-leaves.jpg':'42% 45%','unity-shader.jpg':'52% 45%','punk-world.jpg':'38% 50%','punk-desk.jpg':'25% 40%','ai-clone.jpg':'50% 34%','ai-driving.jpg':'50% 72%','ai-ep01.jpg':'50% 30%','ai-roti.jpg':'50% 50%','ai-kinetic.jpg':'50% 32%','ai-ufo.jpg':'50% 22%','about-sculpt.jpg':'40% 50%','ape-point.jpg':'50% 30%','ape-tram.jpg':'70% 45%','ape-paper.jpg':'60% 20%','ape-bag.jpg':'50% 40%'};
+const SPOT={'punk-city.jpg':'50% 45%','about-outfit.jpg':'50% 28%','about-body.jpg':'50% 28%','about-id.jpg':'50% 30%','about-face.jpg':'50% 32%','about-wire.jpg':'50% 35%','unity-globe.jpg':'50% 45%','unity-forest.jpg':'50% 50%','ai-tech.jpg':'50% 40%','peng-logo.jpg':'50% 50%','peng-ski.jpg':'50% 35%','peng-crown.jpg':'50% 38%','peng-scroll.jpg':'50% 24%','natto-anime.webp':'50% 42%','natto-3d.webp':'50% 46%','peng-crew.jpg':'50% 10%','peng-contract.jpg':'50% 52%','peng-guardian.jpg':'50% 33%','fn-proxie2.jpg':'50% 22%','fn-bullbear.jpg':'72% 50%','fn-broom.jpg':'72% 50%','unity-vrchat.jpg':'50% 18%','unity-leaves.jpg':'42% 45%','unity-shader.jpg':'52% 45%','punk-world.jpg':'38% 50%','punk-desk.jpg':'25% 40%','ai-clone.jpg':'50% 34%','ai-driving.jpg':'50% 72%','ai-ep01.jpg':'50% 30%','ai-roti-v.jpg':'50% 45%','ai-kinetic.jpg':'50% 32%','ai-ufo.jpg':'50% 22%','about-sculpt.jpg':'40% 50%','ape-point.jpg':'50% 30%','ape-tram.jpg':'70% 45%','ape-paper.jpg':'60% 20%','ape-bag.jpg':'50% 40%'};
 const tile=(it,i)=>`<button class="work" data-i="${i}" aria-label="ดู ${it[0]}"><img src="${A(it[1])}" alt="" style="object-position:${SPOT[it[1]]||'50% 50%'}">${it[2]&&!calm?`<video class="lp" src="${A('v/t-'+it[2])}" muted loop playsinline autoplay preload="metadata" style="object-position:${SPOT[it[1]]||'50% 50%'}"></video>`:''}${it[3]?'<i>WEB</i>':it[2]?'<i>PLAY</i>':''}<span>${it[0].split(' · ')[0]}</span></button>`;
 
 /* ---------- work panels: paged, nothing scrolls ---------- */
